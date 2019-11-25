@@ -35,15 +35,15 @@ function PokeProfileModal(props) {
 
 export default class PokemonCard extends Component {
     state = {
-        url: this.props.url,
-        name: this.props.name,
-        pokeData: '',
-        image: '',
-        pokeIndex: '',
-        height: '',
-        weight: '',
-        types: [],
-        showModal: false
+      url: this.props.url,
+      name: this.props.name,
+      pokeData: '',
+      image: '',
+      pokeIndex: '',
+      height: '',
+      weight: '',
+      types: [],
+      showModal: false,
     }
 
     async componentDidMount() {
@@ -60,13 +60,14 @@ export default class PokemonCard extends Component {
 
     render() {
         return (
+          <React.Fragment>
             <div className="col-md-3 col-sm-6 mb-5">
-                <CardDeck>
-                    <Card className="text-center" onClick={() => this.setState({ showModal: true })}>
-                        <Card.Img variant="top" src={this.state.image} />
-                        <Card.Header>{this.state.name}</Card.Header>
-                    </Card>
-                </CardDeck>
+                  <CardDeck>
+                      <Card className="text-center" onClick={() => this.setState({ showModal: true })}>
+                          <Card.Img variant="top" src={this.state.image} />
+                          <Card.Header>{this.state.name}</Card.Header>
+                      </Card>
+                  </CardDeck>
 
                 <PokeProfileModal
                     show = {this.state.showModal}
@@ -75,6 +76,7 @@ export default class PokemonCard extends Component {
                     name = {this.state.name}
                 />
             </div>
+          </React.Fragment>
         )
     }
 }
