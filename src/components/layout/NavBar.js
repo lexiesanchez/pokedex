@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios';
 import Navbar from 'react-bootstrap/Navbar';
 import Dropdown from 'react-bootstrap/Dropdown';
 import InputGroup from 'react-bootstrap/InputGroup'
@@ -13,6 +14,19 @@ const GroupContainer = styled.div `
 `;
 
 export default class NavBar extends Component {
+    state = {
+        url: 'https://pokeapi.co/api/v2/type/',
+        types: [],
+        selectedType: null
+    };
+
+    async componentDidMount() {
+        const res = await axios.get(this.state.url);
+        this.setState({
+            types: res.data['results'],
+        });
+    }
+
     render() {
         return (
             <div className="main">
@@ -25,13 +39,17 @@ export default class NavBar extends Component {
                         <Form.Control className="searchbar" type="text" placeholder="Search Pokemon"/>
                         <Dropdown>
                             <Dropdown.Toggle className="dropdown">
-                                Select Type
+                                {this.state.selectedType ? (this.state.selectedType) : ('Select Type')} 
                             </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <Dropdown.Item>Electric</Dropdown.Item>
-                                <Dropdown.Item>Grass</Dropdown.Item>
-                                <Dropdown.Item>Water</Dropdown.Item>
-                            </Dropdown.Menu>
+                            {this.state.types ? 
+                                (<Dropdown.Menu>
+                                    {this.state.types.map(type => (
+                                        <Dropdown.Item 
+                                            eventKey={type.name}>
+                                                {type.name}
+                                        </Dropdown.Item>
+                                    ))}
+                                </Dropdown.Menu>) : (null)}
                         </Dropdown>
                         </Row>
                     </GroupContainer>
