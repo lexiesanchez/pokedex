@@ -5,6 +5,9 @@ import CardDeck from 'react-bootstrap/Card'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 function PokeProfileModal(props) {
     return (
@@ -20,11 +23,35 @@ function PokeProfileModal(props) {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <Image 
-                src={props.image}  
-                width={200}
-                height={200}
-                rounded />
+        <Container>
+          <Row className="show-grid">
+            <Col xs={6} md={4}>
+              <Image 
+                  src={props.image}  
+                  width={200}
+                  height={200}
+                  rounded />
+            </Col>
+            <Col xs={6} md={4}>
+              <code>.col-xs-6 .col-md-4</code>
+            </Col>
+            <Col xs={6} md={4}>
+              <code>.col-xs-6 .col-md-4</code>
+            </Col>
+          </Row>
+
+          <Row className="show-grid">
+            <Col xs={6} md={4}>
+              <code>.col-xs-6 .col-md-4</code>
+            </Col>
+            <Col xs={6} md={4}>
+              <code>.col-xs-6 .col-md-4</code>
+            </Col>
+            <Col xs={6} md={4}>
+              <code>.col-xs-6 .col-md-4</code>
+            </Col>
+          </Row>
+        </Container>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={props.onHide}>Close</Button>
@@ -48,13 +75,16 @@ export default class PokemonCard extends Component {
 
     async componentDidMount() {
         const res = await axios.get(this.state.url);
+        console.log(res.data)
         this.setState({
             //pokeData: res.data,
             image: res.data.sprites.front_default,
             pokeIndex: res.data.id,
             height: res.data.height,
             weight: res.data.weight,
-            types: res.data.types.map(type => type.type.name)
+            stats: res.data.stats,
+            types: res.data.types.map(type => type.type.name),
+            abilities: res.data.abilities.map(ability => ability.ability.name)
         });
     }
 
