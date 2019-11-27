@@ -8,6 +8,29 @@ import Image from 'react-bootstrap/Image'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import Badge from 'react-bootstrap/Badge'
+import ProgressBar from 'react-bootstrap/ProgressBar'
+
+const TYPE_COLORS = {
+  Normal: 'A8A77A',
+  fire: 'EE8130',
+  water: '6390F0',
+  electric: 'F7D02C',
+  grass: '7AC74C',
+  ice: '96D9D6',
+  fighting: 'C22E28',
+  poison: 'A33EA1',
+  ground: 'E2BF65',
+  flying: 'A98FF3',
+  psychic: 'F95587',
+  bug: 'A6B91A',
+  rock: 'B6A136',
+  ghost: '735797',
+  dragon: '6F35FC',
+  dark: '705746',
+  steel: 'B7B7CE',
+  fairy: 'D685AD',
+};
 
 function PokeProfileModal(props) {
     return (
@@ -19,7 +42,7 @@ function PokeProfileModal(props) {
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
-            {props.name}
+          #{props.pokeindex} {props.name}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -32,9 +55,11 @@ function PokeProfileModal(props) {
                   height={200}
                   rounded />
             </Col>
-            <Col xs={6} md={4}>
-              <code>.col-xs-6 .col-md-4</code>
-            </Col>
+            {/* <Col xs={6} md={4}>
+              {props.stats ? props.stats.map(stat =>(               
+                <ProgressBar now={stat.base_stat} label={`${stat.stat.name}%`} />
+              )) : null}
+            </Col> */}
             <Col xs={6} md={4}>
               <code>.col-xs-6 .col-md-4</code>
             </Col>
@@ -42,7 +67,15 @@ function PokeProfileModal(props) {
 
           <Row className="show-grid">
             <Col xs={6} md={4}>
-              <code>.col-xs-6 .col-md-4</code>
+              {props.types ? props.types.map(type =>( 
+                <Badge pill 
+                  key={type}
+                  style={{backgroundColor: `#${TYPE_COLORS[type]}`,
+                    padding: '8px 8px',
+                    color: 'white'}}>
+                    {type}
+                </Badge>
+              )) : null}
             </Col>
             <Col xs={6} md={4}>
               <code>.col-xs-6 .col-md-4</code>
@@ -69,13 +102,15 @@ export default class PokemonCard extends Component {
       pokeIndex: '',
       height: '',
       weight: '',
+      abilities: '',
       types: [],
-      showModal: false,
+      description: '',
+      stats: {},
+      showModal: false
     }
 
     async componentDidMount() {
         const res = await axios.get(this.state.url);
-        console.log(res.data)
         this.setState({
             //pokeData: res.data,
             image: res.data.sprites.front_default,
@@ -86,6 +121,7 @@ export default class PokemonCard extends Component {
             types: res.data.types.map(type => type.type.name),
             abilities: res.data.abilities.map(ability => ability.ability.name)
         });
+        console.log(this.state.stats)
     }
 
     render() {
@@ -103,7 +139,10 @@ export default class PokemonCard extends Component {
                     show = {this.state.showModal}
                     onHide = {() => this.setState({ showModal: false })}
                     image = {this.state.image}
+                    pokeindex = {this.state.pokeIndex}
                     name = {this.state.name}
+                    types = {this.state.types}
+                    stats = {this.state.stats}
                 />
             </div>
           </React.Fragment>
