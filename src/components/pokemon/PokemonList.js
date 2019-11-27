@@ -7,23 +7,31 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import Row from 'react-bootstrap/InputGroup'
 import Form from 'react-bootstrap/Form';
 import styled from 'styled-components';
+import debounce from 'lodash/debounce';
+import Button from 'react-bootstrap/Button'
 
 const GroupContainer = styled.div `
     display: flex;
     align-items: center;
     margin: 0 auto;
+    padding-top: 1rem;
 `;
 
 export default class PokemonList extends Component {
     state = {
         pokemonUrl: 'https://pokeapi.co/api/v2/pokemon/',
         typesUrl: 'https://pokeapi.co/api/v2/type/',
+        allPokemonsUrl: 'https://pokeapi.co/api/v2/pokemon?offset=0&limit=964',
+        allPokemons: null,
         pokemon: null,
         initialPokemon: null,
         pokemonCount: null,
         nextUrl: null,
         hasMore: true,
-        types: [],
+        types: [{
+            name: 'All types',
+            url: null
+        }],
         selectedType: null,
         typeUrl: null
     };
@@ -39,8 +47,12 @@ export default class PokemonList extends Component {
         
         const types = await axios.get(this.state.typesUrl);
         this.setState({
-            types: types.data['results'],
+            types: this.state.types.concat(types.data['results']),
         });
+    }
+
+    UNSAFE_componentWillMount() {        
+        this.handleSearch.cancel();
     }
 
     fetchMoreData = async () => {
@@ -63,30 +75,53 @@ export default class PokemonList extends Component {
     }
 
     handleChange = async (eventType) => {
-        let filteredPokemon = [];
-        let getTypeUrl = this.state.types.find(type => type.name === eventType)
-        let pokeType = await axios.get(getTypeUrl.url);
-        console.log(pokeType.data.pokemon)
-        pokeType.data.pokemon.map(pokemon => (
-            filteredPokemon.push(pokemon.pokemon)
-        ))
-        this.setState({
-            pokemon: filteredPokemon,
-            initialPokemon: filteredPokemon,
-            pokemonCount: filteredPokemon.length,
-            selectedType: eventType
-        });
+        if (eventType === 'All types') {
+            const pokemon = await axios.get(this.state.pokemonUrl);
+            this.setState({
+                pokemon: pokemon.data['results'],
+                nextUrl: pokemon.data.next,
+                pokemonCount: pokemon.data['results'].length,
+                selectedType: null
+            });            
+        } else {
+            let filteredPokemon = [];
+            let getTypeUrl = this.state.types.find(type => type.name === eventType)
+            let pokeType = await axios.get(getTypeUrl.url);
+            //console.log(pokeType.data.pokemon)
+            pokeType.data.pokemon.map(pokemon => (
+                filteredPokemon.push(pokemon.pokemon)
+            ))
+            this.setState({
+                pokemon: filteredPokemon,
+                pokemonCount: filteredPokemon.length,
+                selectedType: eventType
+            });
+        }
     }
-    
-    handleSearch = async (event) => {
-        let searchList = this.state.initialPokemon;
-        let searchText = event.target.value.toLowerCase();
+
+    handleSearch = debounce((text) => {
+        if (text) {
+            this.searchAllPokemon(text.toLowerCase())
+        } else {            
+            this.setState({pokemon: this.state.initialPokemon});
+        }
+    }, 500);
+
+    searchAllPokemon = async (text) => {        
+        const res = await axios.get(this.state.allPokemonsUrl);
+        this.setState({
+            allPokemons: res.data['results'],
+            pokemonCount: res.data['results'].length
+        });
+        let searchList = this.state.allPokemons;
+        
         searchList = searchList.filter(item => {
-            return item.name.toLowerCase().indexOf(searchText) !== -1
+            return item.name.toLowerCase().indexOf(text) !== -1
         });
 
         this.setState({pokemon: searchList});
     }
+    
 
     render() {
         return (
@@ -94,10 +129,13 @@ export default class PokemonList extends Component {
             <InputGroup className="filters">
                 <GroupContainer>
                     <Row>
-                    <Form.Control className="searchbar" type="text" placeholder="Search Pokemon" onChange={this.handleSearch}/>
+                    <Form.Control className="searchbar" 
+                        type="text" 
+                        placeholder="Search Pokemon" 
+                        onChange={e => this.handleSearch(e.target.value)}/>
                     <Dropdown>
                         <Dropdown.Toggle className="dropdown">
-                            {this.state.selectedType ? (this.state.selectedType) : ('Select Type')} 
+                            {this.state.selectedType ? (this.state.selectedType) : ('All types')} 
                         </Dropdown.Toggle>
                         {this.state.types ? 
                             (<Dropdown.Menu>
@@ -112,6 +150,7 @@ export default class PokemonList extends Component {
                                 ))}
                             </Dropdown.Menu>) : (null)}
                     </Dropdown>
+                        <Button variant="secondary">Add Pokemon</Button>
                     </Row>
                 </GroupContainer>
             </InputGroup>
