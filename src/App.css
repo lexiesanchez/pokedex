@@ -3,8 +3,18 @@
 .App {
   font-family: 'Roboto', sans-serif;
   min-height: 100vh;
+  width: auto;
 }
 
 .cards-container {
   padding-top: 5%;
+}
+
+.progress-bar {
+  color: black;
+}
+
+.img {
+  top: 50%;
+  left: 50%;
 }
