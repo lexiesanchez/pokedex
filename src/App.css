@@ -2,8 +2,30 @@
 
 .App {
   font-family: 'Roboto', sans-serif;
+  background-image: url("background.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: contain;
   min-height: 100vh;
   width: auto;
+}
+
+.main .brand {
+  color: white;
+  font-weight: 500;
+}
+
+.searchbar {
+  margin: 1rem;
+}
+
+.dropdownDiv {
+  margin: 1rem;
+}
+
+.btnAdd {
+  margin: 1rem;
 }
 
 .cards-container {
@@ -12,6 +34,7 @@
 
 .progress-bar {
   color: black;
+  font-weight: 700;
 }
 
 .input-form {

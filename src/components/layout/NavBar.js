@@ -5,8 +5,8 @@ export default class NavBar extends Component {
     render() {
         return (
             <div className="main">
-                <Navbar bg="light" expand="lg">
-                    <Navbar.Brand>Pokedex</Navbar.Brand>
+                <Navbar className="justify-content-center" bg="dark" expand="lg">
+                    <Navbar.Brand className="brand">POKEDEX</Navbar.Brand>
                 </Navbar>
             </div>
         )
