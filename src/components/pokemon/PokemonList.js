@@ -1,42 +1,179 @@
 import React, { Component } from 'react'
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import debounce from 'lodash/debounce';
 import PokemonCard from './PokemonCard'
 import InfiniteScroll from "react-infinite-scroll-component"
 import Dropdown from 'react-bootstrap/Dropdown';
 import InputGroup from 'react-bootstrap/InputGroup'
 import Row from 'react-bootstrap/InputGroup'
 import Form from 'react-bootstrap/Form';
-import styled from 'styled-components';
-import debounce from 'lodash/debounce';
 import Button from 'react-bootstrap/Button'
 
 const GroupContainer = styled.div `
     display: flex;
     align-items: center;
     margin: 0 auto;
-    padding-top: 1rem;
+    margin-top: 1rem;
 `;
 
+// function AddCustomPokemon(props) {
+//     return (           
+//         <Modal {...props} size="lg" centered
+//         aria-labelledby="contained-modal-title-vcenter">
+//             <Modal.Header closeButton>
+//                 <Modal.Title id="contained-modal-title-vcenter">
+//                     Add Custom Pokemon
+//                 </Modal.Title>
+//             </Modal.Header>
+//             <Modal.Body>       
+//                 <Container>
+//                     <InputGroup className="mb-3">
+//                         <Row>
+//                             <Col lg={true}>
+//                                 <Form.Control
+//                                     placeholder="Pokemon name"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                             </Col>
+//                             <Col lg={true}>
+//                                 <Select
+//                                     placeholder="select types"
+//                                 //   value={selectedOption}
+//                                 //   onChange={this.handleChange}
+//                                 options={props.types}
+//                                 isMulti isSearchable 
+//                                 />
+//                             </Col>
+//                         </Row>
+//                         <div>          
+//                         <h5 className="mt-5 mx-auto">Stats</h5>
+//                         </div>
+//                         <Row>
+//                             <Col lg={true}>
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="HP"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="attack"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="defense"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                             </Col>
+//                             <Col lg={true}>
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="speed"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="special attack"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="special defense"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                             </Col>
+//                         </Row>
+//                         <div>          
+//                         <h5 className="mt-5 mx-auto">Others</h5>
+//                         </div>
+//                         <Row>
+//                             <Col lg={true}>
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="height"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="weight"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="base experience"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="base happiness"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                             </Col>
+//                             <Col lg={true}>
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="capture rate"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Form.Control
+//                                     className="input-form"
+//                                     placeholder="abilities"
+//                                     aria-describedby="basic-addon1"
+//                                 />
+//                                 <Select
+//                                     className="input-form"
+//                                     placeholder="select habitat"
+//                                 //   value={selectedOption}
+//                                 //   onChange={this.handleChange}
+//                                 options={props.habitats}
+//                                 isSearchable 
+//                                 />
+//                                 <Select
+//                                     className="input-form"
+//                                     placeholder="select egg groups"
+//                                 //   value={selectedOption}
+//                                 //   onChange={this.handleChange}
+//                                 options={props.eggs}
+//                                 isMulti isSearchable 
+//                                 />
+//                             </Col>
+//                         </Row>
+//                     </InputGroup>
+//                 </Container>
+//             </Modal.Body>
+//             <Modal.Footer>
+//                 <Button variant="secondary" onClick={props.onHide}>Close</Button>
+//                 <Button variant="success" onClick={props.onHide}>Save</Button>
+//             </Modal.Footer>
+//         </Modal>
+//     ); 
+//   }
+  
 export default class PokemonList extends Component {
     state = {
         pokemonUrl: 'https://pokeapi.co/api/v2/pokemon/',
         typesUrl: 'https://pokeapi.co/api/v2/type/',
         allPokemonsUrl: 'https://pokeapi.co/api/v2/pokemon?offset=0&limit=964',
+        showModal: false,
         allPokemons: null,
         pokemon: null,
         initialPokemon: null,
         pokemonCount: null,
         nextUrl: null,
         hasMore: true,
+        selectedType: null,
+        typeUrl: null,
         types: [{
             name: 'All types',
             url: null
-        }],
-        selectedType: null,
-        typeUrl: null
+        }]
     };
 
     async componentDidMount() {
+        // fetch pokemons
         const pokemon = await axios.get(this.state.pokemonUrl);
         this.setState({
             pokemon: pokemon.data['results'],
@@ -44,7 +181,7 @@ export default class PokemonList extends Component {
             nextUrl: pokemon.data.next,
             pokemonCount: pokemon.data['results'].length
         });
-        
+        //fetch types
         const types = await axios.get(this.state.typesUrl);
         this.setState({
             types: this.state.types.concat(types.data['results']),
@@ -87,7 +224,6 @@ export default class PokemonList extends Component {
             let filteredPokemon = [];
             let getTypeUrl = this.state.types.find(type => type.name === eventType)
             let pokeType = await axios.get(getTypeUrl.url);
-            //console.log(pokeType.data.pokemon)
             pokeType.data.pokemon.map(pokemon => (
                 filteredPokemon.push(pokemon.pokemon)
             ))
@@ -120,8 +256,7 @@ export default class PokemonList extends Component {
         });
 
         this.setState({pokemon: searchList});
-    }
-    
+    }     
 
     render() {
         return (
@@ -150,10 +285,15 @@ export default class PokemonList extends Component {
                                 ))}
                             </Dropdown.Menu>) : (null)}
                     </Dropdown>
-                        <Button variant="secondary">Add Pokemon</Button>
+                    <Link to="AddPokemon">
+                        <Button variant="secondary" >
+                            Add Pokemon
+                        </Button>
+                    </Link>
                     </Row>
                 </GroupContainer>
             </InputGroup>
+
             <InfiniteScroll
                 dataLength={this.state.pokemonCount}
                 next={this.fetchMoreData}
