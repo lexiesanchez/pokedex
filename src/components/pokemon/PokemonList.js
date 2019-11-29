@@ -12,145 +12,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 
 const GroupContainer = styled.div `
-    display: flex;
     align-items: center;
     margin: 0 auto;
     margin-top: 1rem;
 `;
-
-// function AddCustomPokemon(props) {
-//     return (           
-//         <Modal {...props} size="lg" centered
-//         aria-labelledby="contained-modal-title-vcenter">
-//             <Modal.Header closeButton>
-//                 <Modal.Title id="contained-modal-title-vcenter">
-//                     Add Custom Pokemon
-//                 </Modal.Title>
-//             </Modal.Header>
-//             <Modal.Body>       
-//                 <Container>
-//                     <InputGroup className="mb-3">
-//                         <Row>
-//                             <Col lg={true}>
-//                                 <Form.Control
-//                                     placeholder="Pokemon name"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                             </Col>
-//                             <Col lg={true}>
-//                                 <Select
-//                                     placeholder="select types"
-//                                 //   value={selectedOption}
-//                                 //   onChange={this.handleChange}
-//                                 options={props.types}
-//                                 isMulti isSearchable 
-//                                 />
-//                             </Col>
-//                         </Row>
-//                         <div>          
-//                         <h5 className="mt-5 mx-auto">Stats</h5>
-//                         </div>
-//                         <Row>
-//                             <Col lg={true}>
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="HP"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="attack"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="defense"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                             </Col>
-//                             <Col lg={true}>
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="speed"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="special attack"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="special defense"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                             </Col>
-//                         </Row>
-//                         <div>          
-//                         <h5 className="mt-5 mx-auto">Others</h5>
-//                         </div>
-//                         <Row>
-//                             <Col lg={true}>
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="height"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="weight"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="base experience"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="base happiness"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                             </Col>
-//                             <Col lg={true}>
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="capture rate"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Form.Control
-//                                     className="input-form"
-//                                     placeholder="abilities"
-//                                     aria-describedby="basic-addon1"
-//                                 />
-//                                 <Select
-//                                     className="input-form"
-//                                     placeholder="select habitat"
-//                                 //   value={selectedOption}
-//                                 //   onChange={this.handleChange}
-//                                 options={props.habitats}
-//                                 isSearchable 
-//                                 />
-//                                 <Select
-//                                     className="input-form"
-//                                     placeholder="select egg groups"
-//                                 //   value={selectedOption}
-//                                 //   onChange={this.handleChange}
-//                                 options={props.eggs}
-//                                 isMulti isSearchable 
-//                                 />
-//                             </Col>
-//                         </Row>
-//                     </InputGroup>
-//                 </Container>
-//             </Modal.Body>
-//             <Modal.Footer>
-//                 <Button variant="secondary" onClick={props.onHide}>Close</Button>
-//                 <Button variant="success" onClick={props.onHide}>Save</Button>
-//             </Modal.Footer>
-//         </Modal>
-//     ); 
-//   }
   
 export default class PokemonList extends Component {
     state = {
@@ -173,6 +38,17 @@ export default class PokemonList extends Component {
     };
 
     async componentDidMount() {
+        // get custom pokemons in localStorage
+        let key, value
+        let tempArr = []
+  
+        for (let i=0; i<localStorage.length; i++) {
+          key = localStorage.key(i);        
+          value = localStorage.getItem(key);    
+          tempArr.push(JSON.parse(value));   
+          this.setState({ customPokemons: tempArr })
+        }
+        
         // fetch pokemons
         const pokemon = await axios.get(this.state.pokemonUrl);
         this.setState({
@@ -268,7 +144,7 @@ export default class PokemonList extends Component {
                         type="text" 
                         placeholder="Search Pokemon" 
                         onChange={e => this.handleSearch(e.target.value)}/>
-                    <Dropdown>
+                    <Dropdown className="dropdownDiv">
                         <Dropdown.Toggle className="dropdown">
                             {this.state.selectedType ? (this.state.selectedType) : ('All types')} 
                         </Dropdown.Toggle>
@@ -286,7 +162,7 @@ export default class PokemonList extends Component {
                             </Dropdown.Menu>) : (null)}
                     </Dropdown>
                     <Link to="AddPokemon">
-                        <Button variant="secondary" >
+                        <Button variant="secondary" className="btnAdd">
                             Add Pokemon
                         </Button>
                     </Link>

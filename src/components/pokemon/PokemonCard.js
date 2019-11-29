@@ -18,6 +18,20 @@ const Bar = styled.div `
   padding-top: 0.5rem;
 `;
 
+const CardWrapper = styled.div`
+  opacity: 0.95;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  &:hover {
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  }
+  -moz-user-select: none;
+  -website-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -o-user-select: none;
+`;
+
 const TYPE_COLORS = {
   normal: 'A8A77A',
   fire: 'EE8130',
@@ -69,12 +83,12 @@ function PokeProfileModal(props) {
                 height={200}/>
           </Col>
           <Col lg={true}>                
-            <Bar><ProgressBar striped now={props.stats.hp} label={`HP ${props.stats.hp}%`}/></Bar>
-            <Bar><ProgressBar striped now={props.stats.attack} label={`ATTACK ${props.stats.attack}%`}/></Bar>
-            <Bar><ProgressBar striped now={props.stats.defense} label={`DEFENSE ${props.stats.defense}%`}/></Bar>
-            <Bar><ProgressBar striped now={props.stats.speed} label={`SPEED ${props.stats.speed}%`}/></Bar>
-            <Bar><ProgressBar striped now={props.stats.specialAttack} label={`SPECIAL ATK ${props.stats.specialAttack}%`}/></Bar>
-            <Bar><ProgressBar striped now={props.stats.specialDefense} label={`SPECIAL DEF ${props.stats.specialDefense}%`}/></Bar>
+            <Bar><ProgressBar striped variant="success" now={props.stats.hp} label={`HP ${props.stats.hp}%`}/></Bar>
+            <Bar><ProgressBar striped variant="info" now={props.stats.attack} label={`ATTACK ${props.stats.attack}%`}/></Bar>
+            <Bar><ProgressBar striped variant="warning" now={props.stats.defense} label={`DEFENSE ${props.stats.defense}%`}/></Bar>
+            <Bar><ProgressBar striped variant="success" now={props.stats.speed} label={`SPEED ${props.stats.speed}%`}/></Bar>
+            <Bar><ProgressBar striped variant="info" now={props.stats.specialAttack} label={`SPECIAL ATK ${props.stats.specialAttack}%`}/></Bar>
+            <Bar><ProgressBar striped variant="warning" now={props.stats.specialDefense} label={`SPECIAL DEF ${props.stats.specialDefense}%`}/></Bar>
           </Col>
         </Row>
       </Container>
@@ -188,130 +202,131 @@ export default class PokemonCard extends Component {
       third_evo: '',
       third_evo_name: '',
       third_evo_image: '',
+      customPokemons: '',
     }
 
     async componentDidMount() {
-        // fetch basic profile
-        const res = await axios.get(this.state.url);
-        let { hp, attack, defense, speed, specialAttack, specialDefense } = '';
-    
-        res.data.stats.map(stat => {
-          switch (stat.stat.name) {
-            case 'hp':
-              hp = stat['base_stat'];
-              break;
-            case 'attack':
-              attack = stat['base_stat'];
-              break;
-            case 'defense':
-              defense = stat['base_stat'];
-              break;
-            case 'speed':
-              speed = stat['base_stat'];
-              break;
-            case 'special-attack':
-              specialAttack = stat['base_stat'];
-              break;
-            case 'special-defense':
-              specialDefense = stat['base_stat'];
-              break;
-            default:
-              break;
-          }
-        });
+      // fetch basic profile
+      const res = await axios.get(this.state.url);
+      let { hp, attack, defense, speed, specialAttack, specialDefense } = '';
+  
+      res.data.stats.map(stat => {
+        switch (stat.stat.name) {
+          case 'hp':
+            hp = stat['base_stat'];
+            break;
+          case 'attack':
+            attack = stat['base_stat'];
+            break;
+          case 'defense':
+            defense = stat['base_stat'];
+            break;
+          case 'speed':
+            speed = stat['base_stat'];
+            break;
+          case 'special-attack':
+            specialAttack = stat['base_stat'];
+            break;
+          case 'special-defense':
+            specialDefense = stat['base_stat'];
+            break;
+          default:
+            break;
+        }
+      });
+
+      this.setState({
+          image: res.data.sprites.front_default,
+          pokeIndex: res.data.id,
+          height: res.data.height,
+          weight: res.data.weight,
+          base_exp: res.data.base_experience,
+          stats: {
+            hp,
+            attack,
+            defense,
+            speed,
+            specialAttack,
+            specialDefense
+          },
+          types: res.data.types.map(type => type.type.name),
+          abilities: res.data.abilities.map(ability => ability.ability.name),
+          speciesUrl: res.data.species.url
+      });
+
+      // clean object
+      if (this.state.abilities.length > 1) {
+        this.setState({
+          abilities: this.state.abilities.join(', ')
+        })
+      }
+
+      // get species
+      const species_res = await axios.get(this.state.speciesUrl);
+
+      this.setState({
+        base_happiness: species_res.data.base_happiness,
+        capture_rate: species_res.data.capture_rate,
+        egg_groups: species_res.data.egg_groups ? species_res.data.egg_groups.map(egg => egg.name) : null,
+        habitat: species_res.data.habitat ? species_res.data.habitat.name : null,
+        evolutionUrl: species_res.data.evolution_chain.url ? species_res.data.evolution_chain.url : null
+      });
+
+      // clean object
+      if (this.state.egg_groups.length > 1) {
+        this.setState({
+          egg_groups: this.state.egg_groups.join(', ')
+        })
+      }
+      
+      // get evolution chain
+      if (this.state.evolutionUrl) {
+        const evolution_res = await axios.get(this.state.evolutionUrl);
+        //console.log(evolution_res)
 
         this.setState({
-            image: res.data.sprites.front_default,
-            pokeIndex: res.data.id,
-            height: res.data.height,
-            weight: res.data.weight,
-            base_exp: res.data.base_experience,
-            stats: {
-              hp,
-              attack,
-              defense,
-              speed,
-              specialAttack,
-              specialDefense
-            },
-            types: res.data.types.map(type => type.type.name),
-            abilities: res.data.abilities.map(ability => ability.ability.name),
-            speciesUrl: res.data.species.url
+          first_evo: evolution_res.data.chain.species ? evolution_res.data.chain.species : null,
+          second_evo: evolution_res.data.chain.evolves_to[0] ? evolution_res.data.chain.evolves_to[0].species : null,
+          third_evo: (evolution_res.data.chain.evolves_to[0] && evolution_res.data.chain.evolves_to[0].evolves_to[0]) ? evolution_res.data.chain.evolves_to[0].evolves_to[0].species : null,
         });
 
-        // clean object
-        if (this.state.abilities.length > 1) {
+        if (this.state.first_evo) {
+          const first_evo_res = await axios.get(this.state.first_evo.url);
+          let first_evo_id = first_evo_res.data.id
+          // get pokemon evolution
+          let first_evo_url = `https://pokeapi.co/api/v2/pokemon/${first_evo_id}`
+          const first_evo_profile = await axios.get(first_evo_url);
           this.setState({
-            abilities: this.state.abilities.join(', ')
+            first_evo_name: first_evo_profile.data.name,
+            first_evo_image: first_evo_profile.data.sprites.front_default
           })
         }
 
-        // get species
-        const species_res = await axios.get(this.state.speciesUrl);
-
-        this.setState({
-          base_happiness: species_res.data.base_happiness,
-          capture_rate: species_res.data.capture_rate,
-          egg_groups: species_res.data.egg_groups.map(egg => egg.name),
-          habitat: species_res.data.habitat ? species_res.data.habitat.name : null,
-          evolutionUrl: species_res.data.evolution_chain.url
-        });
-
-        // clean object
-        if (this.state.egg_groups.length > 1) {
+        if (this.state.second_evo) {
+          const second_evo_res = await axios.get(this.state.second_evo.url);
+          let second_evo_id = second_evo_res.data.id
+          // get pokemon evolution
+          let second_evo_url = `https://pokeapi.co/api/v2/pokemon/${second_evo_id}`
+          const second_evo_profile = await axios.get(second_evo_url);
           this.setState({
-            egg_groups: this.state.egg_groups.join(', ')
+            second_evo_name: second_evo_profile.data.name,
+            second_evo_image: second_evo_profile.data.sprites.front_default
           })
         }
-        
-        // get evolution chain
-        if (this.state.evolutionUrl) {
-          const evolution_res = await axios.get(this.state.evolutionUrl);
-          //console.log(evolution_res)
 
+        if (this.state.third_evo) {
+          const third_evo_res = await axios.get(this.state.third_evo.url);
+          let third_evo_id = third_evo_res.data.id
+          // get pokemon evolution
+          let third_evo_url = `https://pokeapi.co/api/v2/pokemon/${third_evo_id}`
+          const third_evo_profile = await axios.get(third_evo_url);
           this.setState({
-            first_evo: evolution_res.data.chain.species ? evolution_res.data.chain.species : null,
-            second_evo: evolution_res.data.chain.evolves_to[0] ? evolution_res.data.chain.evolves_to[0].species : null,
-            third_evo: (evolution_res.data.chain.evolves_to[0] && evolution_res.data.chain.evolves_to[0].evolves_to[0]) ? evolution_res.data.chain.evolves_to[0].evolves_to[0].species : null,
-          });
-
-          if (this.state.first_evo) {
-            const first_evo_res = await axios.get(this.state.first_evo.url);
-            let first_evo_id = first_evo_res.data.id
-            // get pokemon evolution
-            let first_evo_url = `https://pokeapi.co/api/v2/pokemon/${first_evo_id}`
-            const first_evo_profile = await axios.get(first_evo_url);
-            this.setState({
-              first_evo_name: first_evo_profile.data.name,
-              first_evo_image: first_evo_profile.data.sprites.front_default
-            })
-          }
-
-          if (this.state.second_evo) {
-            const second_evo_res = await axios.get(this.state.second_evo.url);
-            let second_evo_id = second_evo_res.data.id
-            // get pokemon evolution
-            let second_evo_url = `https://pokeapi.co/api/v2/pokemon/${second_evo_id}`
-            const second_evo_profile = await axios.get(second_evo_url);
-            this.setState({
-              second_evo_name: second_evo_profile.data.name,
-              second_evo_image: second_evo_profile.data.sprites.front_default
-            })
-          }
-
-          if (this.state.third_evo) {
-            const third_evo_res = await axios.get(this.state.third_evo.url);
-            let third_evo_id = third_evo_res.data.id
-            // get pokemon evolution
-            let third_evo_url = `https://pokeapi.co/api/v2/pokemon/${third_evo_id}`
-            const third_evo_profile = await axios.get(third_evo_url);
-            this.setState({
-              third_evo_name: third_evo_profile.data.name,
-              third_evo_image: third_evo_profile.data.sprites.front_default
-            })
-          }
-
+            third_evo_name: third_evo_profile.data.name,
+            third_evo_image: third_evo_profile.data.sprites.front_default
+          })
         }
+
+      }
     }
 
     render() {
@@ -319,10 +334,12 @@ export default class PokemonCard extends Component {
           <React.Fragment>
             <div className="col-md-3 col-sm-6 mb-5">
                   <CardDeck>
+                    <CardWrapper>
                       <Card className="text-center" onClick={() => this.setState({ showModal: true })}>
                           <Card.Img variant="top" src={this.state.image} />
                           <Card.Header>{this.state.name}</Card.Header>
                       </Card>
+                    </CardWrapper>
                   </CardDeck>
 
                 <PokeProfileModal
