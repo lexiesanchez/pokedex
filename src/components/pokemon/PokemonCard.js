@@ -7,8 +7,6 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import Figure from 'react-bootstrap/Figure'
-import FigureImage from 'react-bootstrap/FigureImage'
-import FigureCaption from 'react-bootstrap/FigureCaption'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -17,7 +15,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import ListGroup from 'react-bootstrap/ListGroup'
 
 const Bar = styled.div `
-    padding-top: 0.5rem;
+  padding-top: 0.5rem;
 `;
 
 const TYPE_COLORS = {
@@ -42,101 +40,96 @@ const TYPE_COLORS = {
 };
 
 function PokeProfileModal(props) {
-    return (
-      <Modal
-        {...props}
-        size="lg"
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-      >
-        <Modal.Header>
-          <Modal.Title id="contained-modal-title-vcenter">
-          #{props.pokeindex} {props.name}
-          </Modal.Title>
-            <div className="float-right">
-              {props.types ? props.types.map(type =>( 
-                <Badge pill 
-                  key={type}
-                  style={{backgroundColor: `#${TYPE_COLORS[type]}`,
-                    padding: '10px 10px',
-                    color: 'white'}}>
-                    {type}
-                </Badge>
-              )) : null}
-            </div>
-        </Modal.Header>
-        <Modal.Body>
+  return (
+    <Modal {...props} size="lg" centered
+      aria-labelledby="contained-modal-title-vcenter">
+      <Modal.Header>
+        <Modal.Title id="contained-modal-title-vcenter">
+        #{props.pokeindex} {props.name}
+        </Modal.Title>
+          <div className="float-right">
+            {props.types ? props.types.map(type =>( 
+              <Badge pill 
+                key={type}
+                style={{backgroundColor: `#${TYPE_COLORS[type]}`,
+                  padding: '10px 10px',
+                  color: 'white'}}>
+                  {type}
+              </Badge>
+            )) : null}
+          </div>
+      </Modal.Header>
+      <Modal.Body>
+      <Container>
+        <Row className="justify-content-center">
+          <Col lg={true}>
+            <Image fluid
+                src={props.image}  
+                width={200}
+                height={200}/>
+          </Col>
+          <Col lg={true}>                
+            <Bar><ProgressBar striped now={props.stats.hp} label={`HP ${props.stats.hp}%`}/></Bar>
+            <Bar><ProgressBar striped now={props.stats.attack} label={`ATTACK ${props.stats.attack}%`}/></Bar>
+            <Bar><ProgressBar striped now={props.stats.defense} label={`DEFENSE ${props.stats.defense}%`}/></Bar>
+            <Bar><ProgressBar striped now={props.stats.speed} label={`SPEED ${props.stats.speed}%`}/></Bar>
+            <Bar><ProgressBar striped now={props.stats.specialAttack} label={`SPECIAL ATK ${props.stats.specialAttack}%`}/></Bar>
+            <Bar><ProgressBar striped now={props.stats.specialDefense} label={`SPECIAL DEF ${props.stats.specialDefense}%`}/></Bar>
+          </Col>
+        </Row>
+      </Container>
+      <Container>
+        <Row>
+          <Col lg={true} className="mt-5">   
+            <ListGroup>
+              <ListGroup.Item>height: {props.height}</ListGroup.Item>
+              <ListGroup.Item>weight: {props.weight}</ListGroup.Item>
+              <ListGroup.Item>base exp: {props.base_exp}</ListGroup.Item>
+              <ListGroup.Item>base happiness: {props.base_happiness}</ListGroup.Item>
+            </ListGroup>
+          </Col>
+          <Col lg={true} className="mt-5">   
+            <ListGroup>
+              <ListGroup.Item>capture rate: {props.capture_rate}</ListGroup.Item>
+              <ListGroup.Item>habitat: {props.habitat}</ListGroup.Item>
+              <ListGroup.Item>abilities: {props.abilities}  </ListGroup.Item>
+              <ListGroup.Item>egg groups: {props.egg_groups}</ListGroup.Item>
+            </ListGroup>
+          </Col>
+        </Row>
+      </Container>
+      <div>          
+        <h5 className="mt-5 mx-auto">Evolution Chain</h5>
+      </div>
+      {props.second_evo_image ? (
         <Container>
           <Row className="justify-content-center">
             <Col lg={true}>
-              <Image fluid
-                  src={props.image}  
-                  width={200}
-                  height={200}
-                  rounded />
-            </Col>
-            <Col lg={true}>                
-                <Bar><ProgressBar striped now={props.stats.hp} label={`HP ${props.stats.hp}%`}/></Bar>
-                <Bar><ProgressBar striped now={props.stats.attack} label={`ATTACK ${props.stats.attack}%`}/></Bar>
-                <Bar><ProgressBar striped now={props.stats.defense} label={`DEFENSE ${props.stats.defense}%`}/></Bar>
-                <Bar><ProgressBar striped now={props.stats.speed} label={`SPEED ${props.stats.speed}%`}/></Bar>
-                <Bar><ProgressBar striped now={props.stats.specialAttack} label={`SPECIAL ATK ${props.stats.specialAttack}%`}/></Bar>
-                <Bar><ProgressBar striped now={props.stats.specialDefense} label={`SPECIAL DEF ${props.stats.specialDefense}%`}/></Bar>
-            </Col>
-          </Row>
-        </Container>
-        <Container>
-          <Row>
-            <Col lg={true} className="mt-5">   
-              <ListGroup>
-                <ListGroup.Item>height: {props.height}</ListGroup.Item>
-                <ListGroup.Item>weight: {props.weight}</ListGroup.Item>
-                <ListGroup.Item>base exp: {props.base_exp}</ListGroup.Item>
-                <ListGroup.Item>base happiness: {props.base_happiness}</ListGroup.Item>
-              </ListGroup>
-            </Col>
-            <Col lg={true} className="mt-5">   
-              <ListGroup>
-                <ListGroup.Item>capture rate: {props.capture_rate}</ListGroup.Item>
-                <ListGroup.Item>habitat: {props.habitat}</ListGroup.Item>
-                <ListGroup.Item>abilities: {props.abilities}  </ListGroup.Item>
-                <ListGroup.Item>egg groups: {props.egg_groups}</ListGroup.Item>
-              </ListGroup>
-            </Col>
-          </Row>
-        </Container>
-        <div>          
-          <h5 className="mt-5 mx-auto">Evolution Chain</h5>
-        </div>
-        {props.second_evo_image ? (
-          <Container>
-          <Row className="justify-content-center">
-            <Col lg={true}>
-            <Figure>
-              <Figure.Image
-                  src={props.first_evo_image}  
-                  width={200}
-                  height={200}
-              />
-              <Figure.Caption className="text-center">
-                {props.first_evo_name} 
-              </Figure.Caption>
-            </Figure>
+              <Figure>
+                <Figure.Image
+                    src={props.first_evo_image}  
+                    width={200}
+                    height={200}
+                />
+                <Figure.Caption className="text-center">
+                  {props.first_evo_name} 
+                </Figure.Caption>
+              </Figure>
             </Col>
             <Col lg={true}>
-            <Figure>
-              <Figure.Image
-                  src={props.second_evo_image}  
-                  width={200}
-                  height={200}
-              />
-              <Figure.Caption className="text-center">
-                {props.second_evo_name} 
-              </Figure.Caption>
-            </Figure>
+              <Figure>
+                <Figure.Image
+                    src={props.second_evo_image}  
+                    width={200}
+                    height={200}
+                />
+                <Figure.Caption className="text-center">
+                  {props.second_evo_name} 
+                </Figure.Caption>
+              </Figure>
             </Col>
             {props.third_evo_image ? (
-              <Col lg={true}>
+            <Col lg={true}>
               <Figure>
                 <Figure.Image
                     src={props.third_evo_image}  
@@ -150,14 +143,14 @@ function PokeProfileModal(props) {
             </Col>
             ) : (null)}              
           </Row>
-          </Container>
-        ) : ('NO EVOLUTION')}          
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={props.onHide}>Close</Button>
-        </Modal.Footer>
-      </Modal>
-    );
+        </Container>
+      ) : ('NO EVOLUTION')}          
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={props.onHide}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
 }
 
 export default class PokemonCard extends Component {
@@ -200,7 +193,6 @@ export default class PokemonCard extends Component {
     async componentDidMount() {
         // fetch basic profile
         const res = await axios.get(this.state.url);
-
         let { hp, attack, defense, speed, specialAttack, specialDefense } = '';
     
         res.data.stats.map(stat => {
@@ -275,7 +267,7 @@ export default class PokemonCard extends Component {
         // get evolution chain
         if (this.state.evolutionUrl) {
           const evolution_res = await axios.get(this.state.evolutionUrl);
-          console.log(evolution_res)
+          //console.log(evolution_res)
 
           this.setState({
             first_evo: evolution_res.data.chain.species ? evolution_res.data.chain.species : null,
