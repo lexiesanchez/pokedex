@@ -42,12 +42,12 @@ export default class PokemonList extends Component {
         let key, value
         let tempArr = []
   
-        for (let i=0; i<localStorage.length; i++) {
-          key = localStorage.key(i);        
-          value = localStorage.getItem(key);    
-          tempArr.push(JSON.parse(value));   
-          this.setState({ customPokemons: tempArr })
-        }
+        // for (let i=0; i<localStorage.length; i++) {
+        //   key = localStorage.key(i);        
+        //   value = localStorage.getItem(key);    
+        //   tempArr.push(JSON.parse(value));   
+        //   this.setState({ customPokemons: tempArr })
+        // }
         
         // fetch pokemons
         const pokemon = await axios.get(this.state.pokemonUrl);
