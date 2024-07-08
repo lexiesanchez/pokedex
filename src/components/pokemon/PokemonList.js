@@ -45,7 +45,7 @@ export default class PokemonList extends Component {
         for (let i=0; i<localStorage.length; i++) {
           key = localStorage.key(i);        
           value = localStorage.getItem(key);    
-          tempArr.push(JSON.parse(value));   
+          // tempArr.push(JSON.parse(value));   
           this.setState({ customPokemons: tempArr })
         }
         
